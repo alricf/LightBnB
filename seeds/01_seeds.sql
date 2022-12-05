@@ -7,10 +7,10 @@ INSERT INTO properties (owner_id, title, description, thumbnail_photo_url, cover
 (3, 'Habit mix', 'description 3', 'https://abc3.com.jpeg', 'https://c123.com.jpeg', 300, 3, 4, 5, 'Canada', '1650 Hejto Center', 'Genwezuj', 'Newfoundland And Labrador', '44583', true);
 
 INSERT INTO reservations (start_date, end_date, property_id, guest_id)
-VALUES ('2018-09-11', '2018-09-26', 1, 1),
-('2019-01-04', '2019-02-01', 2, 2),
-('2021-10-01', '2021-10-14', 3, 3);
+VALUES ('2018-09-11', '2018-09-26', 1, 2),
+('2019-01-04', '2019-02-01', 2, 3),
+('2021-10-01', '2021-10-14', 3, 1);
 
-INSERT INTO property_reviews (guest_id, property_id, reservation_id, rating, message) VALUES (1, 2, 3, 4, 'message 1'),
-(2, 3, 1, 5, 'message 2'),
-(3, 1, 2, 3, 'message 3');
+INSERT INTO property_reviews (guest_id, property_id, reservation_id, rating, message) VALUES (2, 1, 1, 4, 'message 1'),
+(3, 2, 2, 5, 'message 2'),
+(1, 3, 3, 3, 'message 3');
