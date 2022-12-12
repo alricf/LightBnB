@@ -147,11 +147,11 @@ const getAllProperties = (options, limit = 10) => {
     queryParams.push(min);
     queryParams.push(max);
     queryString += `AND ($${queryParams.length - 1} < properties.cost_per_night AND properties.cost_per_night < $${queryParams.length})\n`;
-  } else if (options.minimum_price_per_night && !options.   maximum_price_per_night) {
+  } else if (options.minimum_price_per_night && !options.maximum_price_per_night) {
     min = options.minimum_price_per_night * 100;
     queryParams.push(min);
     queryString += `AND $${queryParams.length} < properties.cost_per_night\n`;
-  } else if(!options.minimum_price_per_night && options.   maximum_price_per_night) {
+  } else if (!options.minimum_price_per_night && options.maximum_price_per_night) {
     max = options.maximum_price_per_night * 100;
     queryParams.push(max);
     queryString += `AND properties.cost_per_night < $${queryParams.length}\n`;
@@ -186,10 +186,18 @@ exports.getAllProperties = getAllProperties;
  * @param {{}} property An object containing all of the property details.
  * @return {Promise<{}>} A promise to the property.
  */
-const addProperty = function(property) {
-  const propertyId = Object.keys(properties).length + 1;
-  property.id = propertyId;
-  properties[propertyId] = property;
-  return Promise.resolve(property);
+const addProperty = (property) => {
+  return pool
+    .query(
+      `INSERT INTO properties (title, description, thumbnail_photo_url, cover_photo_url, cost_per_night, street, city, province, post_code, country, parking_spaces, number_of_bathrooms, number_of_bedrooms, owner_id)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+      RETURNING *;
+      `, [property.title, property.description, property.thumbnail_photo_url, property.cover_photo_url, property.cost_per_night, property.street, property.city, property.province, property.post_code, property.country, property.parking_spaces, property.number_of_bathrooms, property.number_of_bedrooms, property.owner_id])
+    .then((result) => {
+      // console.log(result.rows[0].id);
+      return result.rows[0];
+    }).catch((err) => {
+      console.log(err.message);
+    });
 };
 exports.addProperty = addProperty;
