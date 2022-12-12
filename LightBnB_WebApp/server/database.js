@@ -20,21 +20,21 @@ const pool = new Pool({
  */
 const getUserWithEmail = (email) => {
   return pool
-  .query(`
+    .query(`
   SELECT * FROM users
   WHERE users.email = $1; 
   `, [email])
-  .then((result) => {
-    if(result.rows === []){
-      return null;
-    }
-    // console.log(result.rows[0]);
-    return result.rows[0];
-  })
-  .catch((err) => {
-    console.log(err.message);
-  });
-}
+    .then((result) => {
+      if (result.rows === []) {
+        return null;
+      }
+      // console.log(result.rows[0]);
+      return result.rows[0];
+    })
+    .catch((err) => {
+      console.log(err.message);
+    });
+};
 exports.getUserWithEmail = getUserWithEmail;
 
 /**
@@ -42,22 +42,22 @@ exports.getUserWithEmail = getUserWithEmail;
  * @param {string} id The id of the user.
  * @return {Promise<{}>} A promise to the user.
  */
-const getUserWithId = function(id) {
+const getUserWithId = (id) => {
   return pool
-  .query(`
+    .query(`
   SELECT * FROM users
   WHERE users.id = $1; 
   `, [id])
-  .then((result) => {
-    if(result.rows === []){
-      return null;
-    }
-    return result.rows[0];
-  })
-  .catch((err) => {
-    console.log(err.message);
-  });
-}
+    .then((result) => {
+      if (result.rows === []) {
+        return null;
+      }
+      return result.rows[0];
+    })
+    .catch((err) => {
+      console.log(err.message);
+    });
+};
 exports.getUserWithId = getUserWithId;
 
 
@@ -68,18 +68,18 @@ exports.getUserWithId = getUserWithId;
  */
 const addUser = (user) => {
   return pool
-  .query(
-    `INSERT INTO USERS (name, password, email)
+    .query(
+      `INSERT INTO USERS (name, password, email)
     VALUES ($1, $2, $3)
     RETURNING *;
-  `,[user.name, user.password, user.email])
-  .then((result) => {
-    // console.log(result.rows[0].id);
-    return result.rows[0].id;
-  }).catch((err) => {
-    console.log(err.message);
-  });
-}
+  `, [user.name, user.password, user.email])
+    .then((result) => {
+      // console.log(result.rows[0].id);
+      return result.rows[0].id;
+    }).catch((err) => {
+      console.log(err.message);
+    });
+};
 exports.addUser = addUser;
 
 /// Reservations
@@ -89,9 +89,26 @@ exports.addUser = addUser;
  * @param {string} guest_id The id of the user.
  * @return {Promise<[{}]>} A promise to the reservations.
  */
-const getAllReservations = function(guest_id, limit = 10) {
-  return getAllProperties(null, 2);
-}
+const getAllReservations = (guest_id, limit = 10) => {
+  return pool
+    .query(`
+      SELECT reservations.*, properties.*, avg(rating) as average_rating
+      FROM reservations
+      JOIN properties ON reservations.property_id = properties.id
+      JOIN property_reviews ON properties.id = property_reviews.property_id
+      WHERE reservations.guest_id = $1
+      AND reservations.end_date < now()::date
+      GROUP BY properties.id, reservations.id
+      ORDER BY reservations.start_date
+      LIMIT $2;
+      `, [guest_id, limit])
+    .then((result) => {
+      // console.log(result.rows);
+      return result.rows;
+    }).catch((err) => {
+      console.log(err.message);
+    });
+};
 exports.getAllReservations = getAllReservations;
 
 /// Properties
@@ -126,5 +143,5 @@ const addProperty = function(property) {
   property.id = propertyId;
   properties[propertyId] = property;
   return Promise.resolve(property);
-}
+};
 exports.addProperty = addProperty;
