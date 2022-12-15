@@ -4,8 +4,8 @@ const users = require('./json/users.json');
 ////////////////////////////Connect to PG database/////////////////////
 const { Pool } = require('pg');
 const pool = new Pool({
-  user: 'af',
-  password: '',
+  user: /*Insert PG DB username (string)*/,
+  password: /*Insert PG DB password (string)*/,
   host: 'localhost',
   database: 'lightbnb'
 });
@@ -21,14 +21,13 @@ const pool = new Pool({
 const getUserWithEmail = (email) => {
   return pool
     .query(`
-  SELECT * FROM users
-  WHERE users.email = $1; 
-  `, [email])
+    SELECT * FROM users
+    WHERE users.email = $1;
+    `, [email])
     .then((result) => {
       if (result.rows === []) {
         return null;
       }
-      // console.log(result.rows[0]);
       return result.rows[0];
     })
     .catch((err) => {
@@ -68,13 +67,12 @@ exports.getUserWithId = getUserWithId;
  */
 const addUser = (user) => {
   return pool
-    .query(
-      `INSERT INTO USERS (name, password, email)
-    VALUES ($1, $2, $3)
-    RETURNING *;
-  `, [user.name, user.password, user.email])
+    .query(`
+      INSERT INTO USERS (name, password, email)
+      VALUES ($1, $2, $3)
+      RETURNING *;
+      `, [user.name, user.password, user.email])
     .then((result) => {
-      // console.log(result.rows[0].id);
       return result.rows[0].id;
     }).catch((err) => {
       console.log(err.message);
@@ -168,9 +166,6 @@ const getAllProperties = (options, limit = 10) => {
   queryString += `ORDER BY cost_per_night
     LIMIT $${queryParams.length};`;
 
-  // console.log(queryString, queryParams);
-
-
   return pool
     .query(queryString, queryParams)
     .then((res) => res.rows)
@@ -179,7 +174,6 @@ const getAllProperties = (options, limit = 10) => {
     });
 };
 exports.getAllProperties = getAllProperties;
-
 
 /**
  * Add a property to the database
